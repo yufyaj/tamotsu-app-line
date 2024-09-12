@@ -1,0 +1,15 @@
+version: '3'
+services:
+  app:
+    build:
+      context: .
+    volumes:
+      - type: bind
+        source: ./src/tamotsu-app
+        target: /src
+      - /src/node_modules
+    ports:
+      - 3000:3000
+      # 以下はsupabaseでhttps通信するために設定
+      # - 443:443
+    tty: true
