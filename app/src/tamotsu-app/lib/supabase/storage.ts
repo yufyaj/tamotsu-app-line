@@ -1,6 +1,4 @@
 import supabase from "@/lib/supabase/supabase";
-import { createPagesServerClient } from "@supabase/auth-helpers-nextjs";
-import { cookies } from "next/headers";
 import { v4 as uuidv4 } from "uuid";
 
 export const upload = async ( file: File ) => {

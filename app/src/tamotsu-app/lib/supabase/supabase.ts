@@ -1,23 +1,17 @@
-import { auth } from '@/lib/auth/auth';
+import { Database } from '@/database.types';
 import { createClient, SupabaseClient } from '@supabase/supabase-js'
-import { Session } from 'next-auth';
 
-const supabaseClient = async ():Promise<SupabaseClient> => {
-  const session = await auth();
-  const {supabaseAccessToken} = session as Session;
-  console.log("session=>", session);
-  console.log(supabaseAccessToken);
-
+const supabaseClient = ():SupabaseClient => {
   return createClient(
     process.env.SUPABASE_URL!,
     process.env.SUPABASE_ANON_KEY!,
-    {
-      global: {
-        headers: {
-          Authorization: `Bearer ${supabaseAccessToken}`,
-        },
-      },
-    }
+  );
+}
+
+export const supabaseDbClient = ():SupabaseClient<Database> => {
+  return createClient<Database>(
+    process.env.SUPABASE_URL!,
+    process.env.SUPABASE_ANON_KEY!,
   );
 }
 
