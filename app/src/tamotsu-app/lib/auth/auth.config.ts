@@ -1,28 +1,26 @@
-import { SupabaseAdapter } from "@auth/supabase-adapter";
-import NextAuth from "next-auth"
-import { Adapter } from "next-auth/adapters";
+import { NextAuthConfig } from "next-auth";
+import line from "next-auth/providers/line";
 import { JWT } from "next-auth/jwt";
-import LINE from "next-auth/providers/line"
- 
-export const { handlers, signIn, signOut, auth } = NextAuth({
-  trustHost: true,
-  providers: [LINE({
-    clientId: process.env.AUTH_LINE_ID,
-    clientSecret: process.env.AUTH_LINE_SECRET,
-    checks:["state"],
-  })],
-  adapter: SupabaseAdapter ({
-    url: process.env.SUPABASE_URL ?? '',
-    secret: process.env.SUPABASE_SERVICE_ROLE_KEY ?? '',
-  }) as Adapter,
+
+
+export default {
+  providers: [
+    line({
+      clientId: process.env.AUTH_LINE_ID,
+      clientSecret: process.env.AUTH_LINE_SECRET,
+      checks:["state"],
+    })
+  ],
+  session: {strategy: "jwt"},
   callbacks: {
     async jwt({ token, account }) {
-      console.log("account=>", account);
+      console.log("jwt_token=>", token);
       if (account) {
         token.accessToken  = account.access_token;
         token.refreshToken = account.refresh_token;
-        token.expiresAt    = Date.now() + (account.expires_in as number * 1000); // + 29日間
+        token.expiresAt    = Date.now() + (account.expires_in as number * 1000); // + 30日間
       }
+      
       // アクセストークンが期限切れの場合、更新を試みる
       if (Date.now() < (token.expiresAt as number)) {
         return token;
@@ -30,11 +28,12 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
       return refreshAccessToken(token);
     },
+
     async redirect({ url, baseUrl }) {
       return "https://5a9e-240b-250-3fe1-b700-ac59-9b24-1585-fe13.ngrok-free.app/login";
     }
   }
-})
+} satisfies NextAuthConfig
 
 async function refreshAccessToken(token: JWT) {
   try {
@@ -42,8 +41,8 @@ async function refreshAccessToken(token: JWT) {
     const bodyParams = new URLSearchParams();
     bodyParams.set("grant_type", "refresh_token");
     bodyParams.set("refresh_token", token.refreshToken as string);
-    bodyParams.set("client_id", process.env.LINE_CLIENT_ID as string);
-    bodyParams.set("client_secret", process.env.LINE_CLIENT_SECRET as string);
+    bodyParams.set("client_id", process.env.AUTH_LINE_ID as string);
+    bodyParams.set("client_secret", process.env.AUTH_LINE_SECRET as string);
 
     const response = await fetch(url, {
       method: "POST",

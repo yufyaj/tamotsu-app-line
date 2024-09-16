@@ -10,6 +10,9 @@ export default function Home() {
       <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
         <button onClick={() => router.push('/login')}>LOGIN</button>
       </div>
+      <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
+        <button onClick={() => router.push('/register/registerUser')}>ユーザー登録</button>
+      </div>
     </main> 
   );
 }
