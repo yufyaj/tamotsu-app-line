@@ -29,9 +29,9 @@ export default {
       return refreshAccessToken(token);
     },
 
-    async redirect({ url, baseUrl }) {
-      return "https://5a9e-240b-250-3fe1-b700-ac59-9b24-1585-fe13.ngrok-free.app/login";
-    }
+    // async redirect({ url, baseUrl }) {
+    //   return url
+    // }
   }
 } satisfies NextAuthConfig
 
