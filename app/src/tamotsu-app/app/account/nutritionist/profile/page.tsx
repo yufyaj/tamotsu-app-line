@@ -1,9 +1,12 @@
+"use client"
+
 import { useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card"
+import ProfileImage from "@/components/profileImage"
 
 export default function NutritionistProfileRegistration() {
   const [formData, setFormData] = useState({
@@ -14,6 +17,8 @@ export default function NutritionistProfileRegistration() {
     education: '',
     bio: '',
   })
+
+  const [profileImage, setProfileImage] = useState<Blob|null>(null)
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
@@ -43,6 +48,7 @@ export default function NutritionistProfileRegistration() {
             <Label htmlFor="name">氏名</Label>
             <Input id="name" name="name" value={formData.name} onChange={handleChange} required />
           </div>
+          <ProfileImage onProfileImageChange={(newImage) => {setProfileImage(newImage)}} />
           <div className="space-y-2">
             <Label htmlFor="license">資格番号</Label>
             <Input id="license" name="license" value={formData.license} onChange={handleChange} required />
