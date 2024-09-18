@@ -1,15 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { verifyToken } from "./lib/line/line";
 import getMyToken from "./lib/token/getMyToken";
-import { JWT } from "next-auth/jwt";
 
 export async function middleware(request: NextRequest) {
-  const token = await getMyToken(request) as unknown as JWT | null;
+  const token = await getMyToken(request)
   if (!token || !token.accessToken) {
     return NextResponse.redirect(new URL('/', request.url))
   }
 
-  if (!await verifyToken(token.accessToken! as string)) {
+  if (!await verifyToken(token.accessToken as string)) {
     return NextResponse.redirect(new URL('/', request.url))
   }
 
@@ -22,5 +21,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/user/:path*', '/nutritionist/:path*'],
+  matcher: '/account/:path*',
 }
