@@ -13,10 +13,10 @@ export default function UserProfileRegistration() {
   const [formData, setFormData] = useState({
     name: '',
     age: '',
-    gender: 'male',
+    gender: 'none',
     height: '',
     weight: '',
-    goals: '',
+    goal: '',
   })
   const [profileImage, setProfileImage] = useState<Blob|null>(null)
 
@@ -32,27 +32,35 @@ export default function UserProfileRegistration() {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+    console.log("formData=>", formData)
     // フォーム送信の処理をここに記述
-    console.log(formData)
+    const response = fetch("/api/account/user/profile", {
+      method: "POST",
+      body: JSON.stringify({
+        ...formData,
+        profileImage
+      }),
+    })
   }
 
   useEffect(() => {
-    const get = async () => {
-      const profile = await fetch("/api/account/user/getProfile")
-      console.log("profile=>",profile.body)
-
-      if (!profile) {
-        setFormData({
-          name: profile.name,
-          age: profile.age,
-          gender: profile.gender,
-          height: profile.header,
-          weight: profile.weight,
-          goals: profile.goal
-        })
+    fetch("/api/account/user/profile").then(async (res: Response) => {
+      try {
+        const profile = await res.json()
+        if (profile !== null) {
+          setFormData({
+            name: profile.name,
+            age: profile.age,
+            gender: profile.gender,
+            height: profile.height,
+            weight: profile.weight,
+            goal: profile.goal ?? ""
+          })
+        }  
+      } catch (error) {
+        console.log(error)
       }
-    }
-    get()
+    })
   }, [])
 
   return (
@@ -74,11 +82,12 @@ export default function UserProfileRegistration() {
           </div>
           <div className="space-y-2">
             <Label htmlFor="gender">性別</Label>
-            <Select name="gender" onValueChange={(value: string) => setFormData(prevState => ({ ...prevState, gender: value }))}>
+            <Select name="gender" value={formData.gender} onValueChange={(value: string) => setFormData(prevState => ({ ...prevState, gender: value }))}>
               <SelectTrigger>
-                <SelectValue placeholder="性別を選択" />
+                <SelectValue />
               </SelectTrigger>
               <SelectContent>
+                <SelectItem value="none">指定しない</SelectItem>
                 <SelectItem value="male">男性</SelectItem>
                 <SelectItem value="female">女性</SelectItem>
                 <SelectItem value="other">その他</SelectItem>
@@ -94,8 +103,8 @@ export default function UserProfileRegistration() {
             <Input id="weight" name="weight" type="number" value={formData.weight} onChange={handleChange} required />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="goals">目標</Label>
-            <Textarea id="goals" name="goals" value={formData.goals} onChange={handleChangeTextArea} />
+            <Label htmlFor="goal">目標</Label>
+            <Textarea id="goal" name="goal" value={formData.goal} onChange={handleChangeTextArea} />
           </div>
         </CardContent>
         <CardFooter>
