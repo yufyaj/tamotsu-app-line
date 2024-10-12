@@ -7,14 +7,14 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card"
 import ProfileImage from "@/components/profileImage"
+import { useRouter } from 'next/navigation'
 
 export default function NutritionistProfileRegistration() {
+  const router = useRouter()
   const [formData, setFormData] = useState({
     name: '',
     license: '',
     specialty: '',
-    experience: '',
-    education: '',
     bio: '',
   })
 
@@ -33,7 +33,16 @@ export default function NutritionistProfileRegistration() {
   const handleSubmit = (e: React.ChangeEvent<HTMLFormElement>) => {
     e.preventDefault()
     // フォーム送信の処理をここに記述
-    console.log(formData)
+    const response = fetch("/api/account/nutritionist/profile", {
+      method: "POST",
+      body: JSON.stringify({
+        ...formData,
+        profileImage
+      }),
+    })
+
+    // TODO: responseがokだったら、選択した管理栄養士がいるかどうかで遷移先を変更
+    router.push("/account/user/nutritionistSelection")
   }
 
   return (
@@ -42,8 +51,8 @@ export default function NutritionistProfileRegistration() {
         <CardTitle>管理栄養士プロフィール登録</CardTitle>
         <CardDescription>あなたの専門情報を入力してください</CardDescription>
       </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <CardContent>
           <div className="space-y-2">
             <Label htmlFor="name">氏名</Label>
             <Input id="name" name="name" value={formData.name} onChange={handleChange} required />
@@ -58,22 +67,14 @@ export default function NutritionistProfileRegistration() {
             <Input id="specialty" name="specialty" value={formData.specialty} onChange={handleChange} required />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="experience">経験年数</Label>
-            <Input id="experience" name="experience" type="number" value={formData.experience} onChange={handleChange} required />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="education">学歴</Label>
-            <Input id="education" name="education" value={formData.education} onChange={handleChange} required />
-          </div>
-          <div className="space-y-2">
             <Label htmlFor="bio">自己紹介</Label>
             <Textarea id="bio" name="bio" value={formData.bio} onChange={handleChangeTextArea} />
           </div>
-        </form>
-      </CardContent>
-      <CardFooter>
-        <Button type="submit" className="w-full">登録する</Button>
-      </CardFooter>
+        </CardContent>
+        <CardFooter>
+          <Button type="submit" className="w-full">登録する</Button>
+        </CardFooter>
+      </form>
     </Card>
   )
 }

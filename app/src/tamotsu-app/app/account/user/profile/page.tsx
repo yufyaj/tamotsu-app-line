@@ -8,8 +8,10 @@ import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card"
 import ProfileImage from "@/components/profileImage"
+import { useRouter } from 'next/navigation'
 
 export default function UserProfileRegistration() {
+  const router = useRouter()
   const [formData, setFormData] = useState({
     name: '',
     age: '',
@@ -33,7 +35,6 @@ export default function UserProfileRegistration() {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     console.log("formData=>", formData)
-    // フォーム送信の処理をここに記述
     const response = fetch("/api/account/user/profile", {
       method: "POST",
       body: JSON.stringify({
@@ -41,6 +42,9 @@ export default function UserProfileRegistration() {
         profileImage
       }),
     })
+
+    // TODO: responseがokだったら、選択した管理栄養士がいるかどうかで遷移先を変更
+    router.push("/account/user/nutritionistSelection")
   }
 
   useEffect(() => {
