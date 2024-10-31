@@ -13,14 +13,20 @@ export default function NutritionistSelection() {
   const [hasMore, setHasMore] = useState(true);
   const [page, setPage] = useState(0);
   const [searchWords, setSearchWords] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false); // モーダルの状態管理
   
   useEffect(() => {
     setNutritionists([])
     setHasMore(true)
     setPage(0)
-    fetchData()
-    return
   }, [searchWords])
+
+  // こうしないとsetPage(0)を実施してもfetchDataの中でpageを指定しようとしても適用されない
+  useEffect(() => {
+    if (page == 0) {
+      fetchData()
+    }
+  }, [page])
 
   const fetchMoreData = () => {
     fetchData()
@@ -28,6 +34,7 @@ export default function NutritionistSelection() {
 
   const fetchData = async () => {
     try {
+      console.log("page:", page)
       const response = await fetch(`/api/account/user/searchNutritionists?query=${searchWords}&page=${page}`)
       const newItems = await response.json()
       console.log('newItems=>',newItems)
@@ -68,15 +75,29 @@ export default function NutritionistSelection() {
   )
 
   const handleSelect = (nutritionist: any) => {
-    setSelectedNutritionist(nutritionist)
+    setSelectedNutritionist(nutritionist);
+    setIsModalOpen(true); // モーダルを開く
+  }
+
+  const closeModal = () => {
+    setIsModalOpen(false); // モーダルを閉じる
+    setSelectedNutritionist(null); // 選択をリセット
   }
 
   const handleConfirm = () => {
     if (selectedNutritionist) {
       // 確認処理をここに記述
       console.log('選択された管理栄養士:', selectedNutritionist)
+      const response = fetch("/api/account/user/chooseNutritionist", {
+        method: "POST",
+        body: JSON.stringify({
+          "nutritionist": selectedNutritionist
+        }),
+      })
     }
   }
+
+  const onChangeSearchBox = (event: React.ChangeEvent<HTMLInputElement>): void => setSearchWords(event.target.value)
 
   return (
     <Card className="w-full max-w-2xl mx-auto">
@@ -86,6 +107,7 @@ export default function NutritionistSelection() {
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
+          <input className="w-full border-2 border-black rounded-lg" type="text" id="searchBox" placeholder="検索文字列を入力" onChange={onChangeSearchBox} />
           <InfiniteScroll
             dataLength={nutritionists.length}
             next={fetchMoreData}
@@ -97,10 +119,25 @@ export default function NutritionistSelection() {
         </div>
       </CardContent>
       <CardFooter>
-        <Button onClick={handleConfirm} disabled={!selectedNutritionist} className="w-full">
-          選択を確定する
-        </Button>
       </CardFooter>
+      {isModalOpen && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white p-4 rounded-lg">
+            <button onClick={closeModal} className="top-2 right-2">×</button>
+            {selectedNutritionist && (
+              <div>
+                <h2 className="font-semibold">{selectedNutritionist.name}</h2>
+                <p>{selectedNutritionist.specialty}</p>
+                <img src={selectedNutritionist.profileImageUrl} alt={selectedNutritionist.name} />
+                {/* 他の詳細情報をここに追加 */}
+              </div>
+            )}
+            <Button onClick={handleConfirm} className="w-full">
+              選択を確定する
+            </Button>
+          </div>
+        </div>
+      )}
     </Card>
   )
 }
