@@ -44,9 +44,7 @@ export const selectNutritionistProfileList = async(query: string, page: number):
     const { data, error } = await supabaseDbClient()
       .from('nutritionist_profiles') 
       .select('*') 
-      .like('name', `%${query}%`)
-      .like('specialty', `%${query}%`)
-      .like('bio', `%${query}%`)
+      .or(`name.like.%${query}%, specialty.like.%${query}%, bio.like.%${query}%`)
       .range(from, from + 9)
       .order('name');
 
@@ -108,6 +106,65 @@ export const upsertNutritionistProfile = async (nutritionistProfile: Tables<"nut
   try {
     const supabase = supabaseDbClient()
     const { error } = await supabase.from('nutritionist_profiles').upsert(nutritionistProfile);
+
+    if (error) {
+      return null;
+    }
+  } catch (error) {
+    return null;
+  }
+}
+
+export const existsActiveChat = async (id: string) => {
+  try {
+    const { data: dataChatParticipant, error: errorChatParticipant } = await supabaseDbClient()
+      .from('chat_participants') 
+      .select('*') 
+      .eq('user_id', id)
+      .order('created_at', {'ascending': false});
+    
+    if (errorChatParticipant) {
+      return true;
+    }
+
+    if (dataChatParticipant.length == 0) {
+      return false;
+    }
+    console.log("dataChatParticipant[0].chat_id=>", dataChatParticipant[0].chat_id)
+    const { data: dataChat, error: errorChat } = await supabaseDbClient()
+      .from('chats') 
+      .select('*') 
+      .eq('canceled_at', null)
+      .eq('id', dataChatParticipant[0].chat_id)
+      .single(); 
+
+    if (errorChat || dataChat) {
+      return true;
+    }
+
+    return false;
+  } catch (error) {
+    return true;
+  }
+}
+
+export const insertChat = async (chat: Tables<"chats">) => {
+  try {
+    const supabase = supabaseDbClient()
+    const { error } = await supabase.from('chats').insert(chat);
+
+    if (error) {
+      return null;
+    }
+  } catch (errro) {
+    return null;
+  }
+}
+
+export const insertChatParticipants = async (chatParticipant: Tables<"chat_participants">) => {
+  try {
+    const supabase = supabaseDbClient()
+    const { error } = await supabase.from('chat_participants').insert(chatParticipant);
 
     if (error) {
       return null;
