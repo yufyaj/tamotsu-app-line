@@ -1,4 +1,4 @@
-import { insertUser, selectUser, selectUserProfile, upsertNutritionistProfile, upsertUserProfile } from "@/lib/supabase/database"
+import { insertUser, selectNutritionistProfile, selectUser, selectUserProfile, upsertNutritionistProfile, upsertUserProfile } from "@/lib/supabase/database"
 import { upload } from "@/lib/supabase/storage"
 import getMyToken from "@/lib/token/getMyToken"
 import { Tables } from "@/types/database.types"
@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
     return new NextResponse(null)
   }
 
-  const profile = await selectUserProfile(savedUser.id)
+  const profile = await selectNutritionistProfile(savedUser.id)
   return new NextResponse(JSON.stringify(profile))
 }
 

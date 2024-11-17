@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -18,7 +18,7 @@ export default function NutritionistProfileRegistration() {
     bio: '',
   })
 
-  const [profileImage, setProfileImage] = useState<Blob|null>(null)
+  const [profileImage, setProfileImage] = useState<Blob | null>(null)
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
@@ -30,10 +30,9 @@ export default function NutritionistProfileRegistration() {
     setFormData(prevState => ({ ...prevState, [name]: value }))
   }
 
-  const handleSubmit = (e: React.ChangeEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    // フォーム送信の処理をここに記述
-    const response = fetch("/api/account/nutritionist/profile", {
+    const response = await fetch("/api/account/nutritionist/profile", {
       method: "POST",
       body: JSON.stringify({
         ...formData,
@@ -44,6 +43,27 @@ export default function NutritionistProfileRegistration() {
     // TODO: responseがokだったら、選択した管理栄養士がいるかどうかで遷移先を変更
     router.push("/account/user/nutritionistSelection")
   }
+
+  useEffect(() => {
+    fetch("/api/account/nutritionist/profile").then(async (res: Response) => {
+      try {
+        const profile = await res.json()
+        if (profile !== null) {
+          setFormData({
+            name: profile.name,
+            license: profile.license,
+            specialty: profile.specialty,
+            bio: profile.bio ?? ""
+          })
+          if (profile.profileImage) {
+            setProfileImage(profile.profileImage)
+          }
+        }
+      } catch (error) {
+        console.log(error)
+      }
+    })
+  }, [])
 
   return (
     <Card className="w-full max-w-md mx-auto">
@@ -57,7 +77,7 @@ export default function NutritionistProfileRegistration() {
             <Label htmlFor="name">氏名</Label>
             <Input id="name" name="name" value={formData.name} onChange={handleChange} required />
           </div>
-          <ProfileImage onProfileImageChange={(newImage) => {setProfileImage(newImage)}} />
+          <ProfileImage onProfileImageChange={(newImage) => { setProfileImage(newImage) }} />
           <div className="space-y-2">
             <Label htmlFor="license">資格番号</Label>
             <Input id="license" name="license" value={formData.license} onChange={handleChange} required />
