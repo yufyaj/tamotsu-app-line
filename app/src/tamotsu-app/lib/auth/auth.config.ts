@@ -14,7 +14,7 @@ export default {
   session: {strategy: "jwt"},
   callbacks: {
     async jwt({ token, account }) {
-      console.log("jwt_token=>", token);
+      console.log("LINE_sub値=>", token.sub);
       if (account) {
         token.accessToken  = account.access_token;
         token.refreshToken = account.refresh_token;
