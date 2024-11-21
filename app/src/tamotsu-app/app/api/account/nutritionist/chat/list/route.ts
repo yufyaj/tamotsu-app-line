@@ -1,4 +1,6 @@
-import { getChatIdByUserId, selectUser } from '@/lib/supabase/database'
+
+import { getChatIdByUserId } from '@/lib/db/chat'
+import { selectUser } from '@/lib/db/user'
 import getMyToken from '@/lib/token/getMyToken'
 import { NextRequest, NextResponse } from 'next/server'
 

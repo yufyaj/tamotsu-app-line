@@ -1,4 +1,4 @@
-import { insertUser, selectUser, selectUserProfile, upsertUserProfile } from "@/lib/supabase/database"
+import { insertUser, selectUser, selectUserProfile, upsertUserProfile } from "@/lib/db/user"
 import { upload } from "@/lib/supabase/storage"
 import getMyToken from "@/lib/token/getMyToken"
 import { Tables } from "@/types/database.types"

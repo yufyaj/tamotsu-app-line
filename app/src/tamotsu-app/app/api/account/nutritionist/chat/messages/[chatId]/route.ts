@@ -1,9 +1,10 @@
 // app/api/account/nutritionist/chat/messages/[chatId]/route.ts
 import { NextRequest, NextResponse } from 'next/server'
-import { insertMessage, getMessages, selectUser } from '@/lib/supabase/database'
+import { insertMessage, getMessages } from '@/lib/db/chat'
 import { upload } from '@/lib/supabase/storage'
 import getMyToken from '@/lib/token/getMyToken'
 import { v4 as uuidv4 } from "uuid";
+import { selectUser } from '@/lib/db/user';
 
 export async function GET(
   request: NextRequest,
