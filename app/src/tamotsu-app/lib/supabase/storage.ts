@@ -5,13 +5,14 @@ export const upload = async ( file: File ) => {
   if (file!!.type.match("image.*")) {
     const fileExtension = file!!.name.split(".").pop()
     const supabaseClient = await supabase();
-    const { error } = await supabaseClient.storage
+    const { data, error } = await supabaseClient.storage
       .from('test')
       .upload(`img/${uuidv4()}.${fileExtension}`, file!!)
     if (error) {
       console.log("エラーが発生しました：" + error.message)
-      return
+      return null
     }
+    return data!.fullPath
   } else {
     console.log("画像ファイル以外はアップロード出来ません。")
   }
