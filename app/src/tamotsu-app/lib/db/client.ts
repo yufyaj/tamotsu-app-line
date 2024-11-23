@@ -1,12 +1,12 @@
 import { Tables } from "@/types/database.types";
 import { supabaseDbClient } from "../supabase/supabase"
 
-export const selectUser = async(sub: string): Promise<Tables<"users"> | null> => {
+export const selectClientProfile = async(id: string): Promise<Tables<"client_profiles"> | null> => {
   try {
     const { data, error } = await supabaseDbClient()
-      .from('users') 
+      .from('client_profiles') 
       .select('*') 
-      .eq('sub', sub) 
+      .eq('user_id', id) 
       .single(); 
 
     if (error) {
@@ -19,10 +19,10 @@ export const selectUser = async(sub: string): Promise<Tables<"users"> | null> =>
   }
 }
 
-export const insertUser = async (user: Tables<"users">) => {
+export const upsertClientProfile = async (userProfile: Tables<"client_profiles">) => {
   try {
     const supabase = supabaseDbClient()
-    const { error } = await supabase.from('users').insert(user);
+    const { error } = await supabase.from('client_profiles').upsert(userProfile);
 
     if (error) {
       return null;

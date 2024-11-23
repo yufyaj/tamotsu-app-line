@@ -1,4 +1,5 @@
-import { insertUser, selectUser, selectUserProfile, upsertUserProfile } from "@/lib/db/user"
+import { selectClientProfile, upsertClientProfile } from "@/lib/db/client"
+import { insertUser, selectUser } from "@/lib/db/user"
 import { upload } from "@/lib/supabase/storage"
 import getMyToken from "@/lib/token/getMyToken"
 import { Tables } from "@/types/database.types"
@@ -18,7 +19,7 @@ export async function GET(request: NextRequest) {
     return new NextResponse(null)
   }
 
-  const profile = await selectUserProfile(savedUser.id)
+  const profile = await selectClientProfile(savedUser.id)
   return new NextResponse(JSON.stringify(profile))
 }
 
@@ -61,7 +62,7 @@ export async function POST(request: NextRequest) {
     await upload(file);  
   }
 
-  const userProfile:Tables<"user_profiles"> = {
+  const clientProfile:Tables<"client_profiles"> = {
     user_id: id,
     age: reqBody.age,
     gender: reqBody.gender,
@@ -73,7 +74,7 @@ export async function POST(request: NextRequest) {
     created_at: now.toISOString(),
   }
   try {
-    await upsertUserProfile(userProfile);
+    await upsertClientProfile(clientProfile);
   } catch (error) {
     console.log("error=>", error)
   }

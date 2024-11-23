@@ -1,4 +1,4 @@
-import { selectNutritionistProfileList, selectUser } from "@/lib/supabase/database";
+import { selectNutritionistProfileList } from "@/lib/db/nutritionist";
 import getMyToken from "@/lib/token/getMyToken";
 import { NextRequest, NextResponse } from "next/server";
 

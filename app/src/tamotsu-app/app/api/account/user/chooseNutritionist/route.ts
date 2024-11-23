@@ -1,4 +1,5 @@
-import { existsActiveChat, insertChat, insertChatParticipants, selectUser } from "@/lib/supabase/database";
+import { existsActiveChat, insertChat, insertChatParticipants } from "@/lib/db/chat";
+import { selectUser } from "@/lib/db/user";
 import getMyToken from "@/lib/token/getMyToken";
 import { Tables } from "@/types/database.types";
 import { NextRequest, NextResponse } from "next/server";
