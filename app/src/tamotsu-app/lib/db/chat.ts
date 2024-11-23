@@ -98,7 +98,7 @@ export const getChatIdByUserId = async (userId: string): Promise<ChatListItem[] 
 
       // Get partner's name
       const { data: profile, error: profileError } = await supabaseDbClient()
-        .from('user_profiles')
+        .from('client_profiles')
         .select('name, profile_image_url')
         .eq('user_id', partner.user_id)
         .single();
