@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
   const user:Tables<"users"> = {
     billing_status: "disactive",
     id: id,
-    role: "user",
+    role: "client",
     sub: sub,
     status: "Profiled",
     created_at: now.toISOString()

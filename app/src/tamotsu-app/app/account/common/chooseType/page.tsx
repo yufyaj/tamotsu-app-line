@@ -8,17 +8,17 @@ import { useRouter } from 'next/navigation'
 
 export default function UserTypeSelection() {
   const router = useRouter()
-  const [selectedType, setSelectedType] = useState<'user' | 'nutritionist' | null>(null)
+  const [selectedType, setSelectedType] = useState<'client' | 'nutritionist' | null>(null)
 
-  const handleSelect = (type: 'user' | 'nutritionist') => {
+  const handleSelect = (type: 'client' | 'nutritionist') => {
     setSelectedType(type)
   }
 
   const handleConfirm = () => {
     if (selectedType) {
       console.log('選択されたユーザータイプ:', selectedType)
-      if (selectedType == "user") {
-        router.push("/account/user/profile")
+      if (selectedType == "client") {
+        router.push("/account/client/profile")
       } else if (selectedType == "nutritionist") {
         router.push("/account/nutritionist/profile")        
       }
@@ -33,9 +33,9 @@ export default function UserTypeSelection() {
       </CardHeader>
       <CardContent className="space-y-4">
         <Button
-          variant={selectedType === 'user' ? 'default' : 'outline'}
+          variant={selectedType === 'client' ? 'default' : 'outline'}
           className="w-full h-20 text-lg justify-start px-4"
-          onClick={() => handleSelect('user')}
+          onClick={() => handleSelect('client')}
         >
           <User className="mr-2 h-6 w-6" />
           ユーザー

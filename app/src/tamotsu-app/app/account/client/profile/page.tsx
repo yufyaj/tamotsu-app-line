@@ -44,7 +44,7 @@ export default function UserProfileRegistration() {
     })
 
     // TODO: responseがokだったら、選択した管理栄養士がいるかどうかで遷移先を変更
-    router.push("/account/user/nutritionistSelection")
+    router.push("/account/client/nutritionistSelection")
   }
 
   useEffect(() => {
