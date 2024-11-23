@@ -1,4 +1,5 @@
 import { NextAuthConfig } from "next-auth";
+import crypto from "crypto";
 import line from "next-auth/providers/line";
 import { JWT } from "next-auth/jwt";
 
@@ -8,12 +9,25 @@ export default {
     line({
       clientId: process.env.AUTH_LINE_ID,
       clientSecret: process.env.AUTH_LINE_SECRET,
-      checks:["state"],
+      authorization: {
+        params: {
+          scope: 'profile openid', // openidスコープを追加
+          nonce: randomString(), // nonceを追加
+        }
+      },
+      checks: ["state", "nonce"], // nonceチェックを追加
     })
   ],
   session: {strategy: "jwt"},
   callbacks: {
     async jwt({ token, account }) {
+      if (account?.id_token) {
+        // id_tokenからsub値を取得
+        const decoded = JSON.parse(
+          Buffer.from(account.id_token.split('.')[1], 'base64').toString()
+        );
+        token.sub = decoded.sub; // 一貫したsub値を設定
+      }
       console.log("LINE_sub値=>", token.sub);
       if (account) {
         token.accessToken  = account.access_token;
@@ -28,10 +42,6 @@ export default {
 
       return refreshAccessToken(token);
     },
-
-    // async redirect({ url, baseUrl }) {
-    //   return url
-    // }
   }
 } satisfies NextAuthConfig
 
@@ -71,4 +81,9 @@ async function refreshAccessToken(token: JWT) {
       error: "RefreshAccessTokenError",
     };
   }
+}
+
+// ランダムな文字列を生成する関数
+function randomString() {
+  return crypto.randomBytes(32).toString('hex');
 }
