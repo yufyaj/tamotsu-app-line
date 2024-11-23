@@ -35,7 +35,7 @@ export default function UserProfileRegistration() {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     console.log("formData=>", formData)
-    const response = fetch("/api/account/user/profile", {
+    const response = fetch("/api/account/client/profile", {
       method: "POST",
       body: JSON.stringify({
         ...formData,
@@ -48,7 +48,7 @@ export default function UserProfileRegistration() {
   }
 
   useEffect(() => {
-    fetch("/api/account/user/profile").then(async (res: Response) => {
+    fetch("/api/account/client/profile").then(async (res: Response) => {
       try {
         const profile = await res.json()
         if (profile !== null) {

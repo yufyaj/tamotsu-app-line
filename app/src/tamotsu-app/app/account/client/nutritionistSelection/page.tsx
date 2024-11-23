@@ -35,7 +35,7 @@ export default function NutritionistSelection() {
   const fetchData = async () => {
     try {
       console.log("page:", page)
-      const response = await fetch(`/api/account/user/searchNutritionists?query=${searchWords}&page=${page}`)
+      const response = await fetch(`/api/account/client/searchNutritionists?query=${searchWords}&page=${page}`)
       const newItems = await response.json()
       console.log('newItems=>',newItems)
       setNutritionists(prevItems => [...prevItems, ...newItems]);
@@ -88,7 +88,7 @@ export default function NutritionistSelection() {
     if (selectedNutritionist) {
       // 確認処理をここに記述
       console.log('選択された管理栄養士:', selectedNutritionist)
-      const response = fetch("/api/account/user/chooseNutritionist", {
+      const response = fetch("/api/account/client/chooseNutritionist", {
         method: "POST",
         body: JSON.stringify({
           "nutritionist": selectedNutritionist
