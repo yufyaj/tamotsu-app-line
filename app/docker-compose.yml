@@ -10,6 +10,27 @@ services:
       - /src/node_modules
     ports:
       - 3000:3000
-      # 以下はsupabaseでhttps通信するために設定
-      # - 443:443
     tty: true
+    depends_on:
+      - websocket
+    networks:
+      - app-network
+
+  websocket:
+    build:
+      context: .
+      dockerfile: Dockerfile.websocket
+    volumes:
+      - type: bind
+        source: ./src/websocket
+        target: /app
+      - /src/node_modules
+    ports:
+      - 4000:4000
+    tty: true
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge

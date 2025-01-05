@@ -6,13 +6,18 @@ export const upload = async ( file: File ) => {
     const fileExtension = file!!.name.split(".").pop()
     const supabaseClient = await supabase();
     const { data, error } = await supabaseClient.storage
-      .from('test')
+      .from('message')
       .upload(`img/${uuidv4()}.${fileExtension}`, file!!)
     if (error) {
       console.log("エラーが発生しました：" + error.message)
       return null
     }
-    return data!.fullPath
+    // 公開URLを取得して返す
+    const { data: { publicUrl } } = supabaseClient.storage
+      .from('message')
+      .getPublicUrl(data.path);
+
+    return publicUrl;
   } else {
     console.log("画像ファイル以外はアップロード出来ません。")
   }

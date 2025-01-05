@@ -1,0 +1,8 @@
+# Node.jsの公式イメージをベースに使用
+FROM node:22.7.0-bookworm-slim
+
+# 作業ディレクトリを設定
+WORKDIR /app
+
+# パッケージ関連ファイルをコピー
+COPY package*.json ./

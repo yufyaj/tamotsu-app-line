@@ -68,6 +68,8 @@ type ChatListItem = {
   last_message_at: string | null;
 }
 
+// TODO: もっと責任を分担できるのでは？
+// TODO: 他でチャットIDだけを取得する関数があるが、そのレベルで分けたい
 export const getChatIdByUserId = async (userId: string): Promise<ChatListItem[] | null> => {
   try {
     // Get active chats for the user
@@ -138,21 +140,47 @@ export const getChatIdByUserId = async (userId: string): Promise<ChatListItem[] 
   }
 }
 
-// lib/supabase/database.ts に追加
-export const getMessages = async (chatId: string) => {
+export const getChatIdByClientUserId = async (userId: string): Promise<string | null> => {
   try {
-    const { data, error } = await supabaseDbClient()
-      .from('messages')
-      .select('*')
-      .eq('chat_id', chatId)
-      .order('sended_at', { ascending: true })
+    const { data: chatParticipant, error: chatParticipantError } = await supabaseDbClient()
+      .from('chat_participants')
+      .select(`
+        chat_id,
+        chats!inner(canceled_at)
+      `)
+      .eq('user_id', userId)
+      .is('chats.canceled_at', null)
+      .single();
+    
+    if (chatParticipantError || !chatParticipant) return null;
 
-    if (error) return null
-    return data
+    return chatParticipant.chat_id;
   } catch (error) {
     return null
   }
 }
+
+// lib/supabase/database.ts に追加
+export const getMessages = async (chatId: string, limit: number = 20, startFrom?: string) => {
+  try {
+    let query = supabaseDbClient()
+      .from('messages')
+      .select('*')
+      .eq('chat_id', chatId)
+      .order('sended_at', { ascending: false })
+      .limit(limit);
+
+    if (startFrom) {
+      query = query.lt('sended_at', startFrom);
+    }
+
+    const { data, error } = await query;
+    if (error) return null;
+    return data.reverse();
+  } catch (error) {
+    return null;
+  }
+};
 
 export const insertMessage = async (message: {
   id: string
@@ -174,6 +202,31 @@ export const insertMessage = async (message: {
 
     if (error) return null
     return data
+  } catch (error) {
+    return null
+  }
+}
+
+export const getChatPartnerSub = async (chatId: string, userId: string) => {
+  try {
+    const { data: partner, error: partnerError } = await supabaseDbClient()
+      .from('chat_participants')
+      .select('user_id')
+      .eq('chat_id', chatId)
+      .neq('user_id', userId)
+      .single()
+
+    if (partnerError) return null
+
+    const { data: partnerId, error: partnerIdError } = await supabaseDbClient()
+    .from('users')
+    .select('sub')
+    .eq('id', partner.user_id)
+    .single()
+
+    if (partnerIdError) return null
+
+    return partnerId.sub
   } catch (error) {
     return null
   }
